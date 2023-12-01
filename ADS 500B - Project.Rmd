@@ -7,10 +7,10 @@ date: "2023-11-27"
 Data and system set-up
 ```{r}
 ##workingdrivelaptop
-setwd('/Users/duynguyen/Library/CloudStorage/OneDrive-UniversityofSanDiego/ADS-500B/Project') 
+##setwd('/Users/duynguyen/Library/CloudStorage/OneDrive-UniversityofSanDiego/ADS-500B/Project') 
 
 ##workingdrivedesktop
-##setwd('/Users/usd-msads/Library/CloudStorage/OneDrive-UniversityofSanDiego/ADS-500B/Project') 
+setwd('/Users/usd-msads/Documents/Documents - DUY’s Mac mini/GitHub/500B Project/') 
 
 ##map data
 df <- read.table('house_sales.csv', header = TRUE, sep=",")
@@ -24,6 +24,7 @@ library(ggplot2)
 library(dplyr)
 library(tidyr)
 library(reshape2)
+library(corrplot)
 ```
 
 Data Definitions
@@ -70,7 +71,7 @@ head(na_df2, 10)
 
 1.1.1 Bedrooms and bathrooms - replace 33 with 3 bedrooms and NA with mean bedrooms
 ```{r}
-df2$bedrooms[df$bedrooms == 33] <- 3
+df2$bedrooms[df2$bedrooms == 33] <- 3
 df2$bedrooms[is.na(df2$bedrooms)]<-mean(df2$bedrooms,na.rm=TRUE)
 df2$bathrooms[is.na(df2$bathrooms)]<-mean(df2$bathrooms,na.rm=TRUE)
 ```
@@ -108,13 +109,16 @@ boxplot(bp3_df2)
 [From sqft_lot remove values greater than 1500000]
 
 ```{r}
-#Remove outler record from sqft_lot that is greater than 1500000
+#Remove outler record from sqft_lot that is greater than 1500000 to create final data frame for analysis
 df_f <- subset(df2,df2$sqft_lot < 1500000)
+head(df_f, 10)
+```
+```{r}
+#Decriptive Statistics
+summary(df_f)
 ```
 
-Final data set for analysis is df_f.  This data frame removes 2 outliers and ~1000 NA records
-
-2. Descriptive Statistics
+2. Descriptive Statistics of columns
 
 Datatypes
 
@@ -129,11 +133,32 @@ waterfront - discrete data
 view - categorical data
 condition - ordinal data
 grade - ordinal data
-sqft_basement - continous data
+sqft_basement - continuous data
 yr_built - discrete data
 yr_renovated - discrete data
 zipcode - categorical
 lat - Continuous data
 long - Continuous data
 
+```{r}
+#create data frame of continuous and discrete data to run correlation test
+df_f_corr <- df_f[, c('price', 'bedrooms', 'bathrooms', 'sqft_living', 'sqft_lot', 'floors', 'waterfront', 'sqft_basement', 'yr_built', 'yr_renovated', 'zipcode', 'lat', 'long')]
+cor(df_f_corr)
+```
+```{r}
+#create a model with correlated values price and sqft_living
+model<- lm(price ~ sqft_living, data=df_f)
+print(model)
+```
 
+
+
+```{r}
+#create scatter plot to look at linear relationship
+ggplot(df_f,aes(x=sqft_living, y = price)) + geom_point() + stat_smooth()
+```
+
+```{r}
+#create scatter plot to look at linear relationship, straight line
+ggplot(df_f,aes(x=sqft_living, y = price)) + geom_point() + stat_smooth(method=lm)
+```
