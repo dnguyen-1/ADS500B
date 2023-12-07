@@ -114,7 +114,7 @@ df_f <- subset(df2,df2$sqft_lot < 1500000)
 head(df_f, 10)
 ```
 ```{r}
-#Decriptive Statistics
+#Descriptive Statistics
 summary(df_f)
 ```
 
@@ -143,6 +143,7 @@ long - Continuous data
 ```{r}
 #create data frame of continuous and discrete data to run correlation test
 df_f_corr <- df_f[, c('price', 'bedrooms', 'bathrooms', 'sqft_living', 'sqft_lot', 'floors', 'waterfront', 'sqft_basement', 'yr_built', 'yr_renovated', 'zipcode', 'lat', 'long')]
+df_f_corr <- scale(df_f_corr)
 cor(df_f_corr)
 ```
 ```{r}
@@ -161,4 +162,14 @@ ggplot(df_f,aes(x=sqft_living, y = price)) + geom_point() + stat_smooth()
 ```{r}
 #create scatter plot to look at linear relationship, straight line
 ggplot(df_f,aes(x=sqft_living, y = price)) + geom_point() + stat_smooth(method=lm)
+```
+```{r}
+summary(model)
+```
+  [value used the model are statistically significant P >.000, adjust r-square value is .4926, ~50 of the dependent variable explains the independent variable ]
+  
+```{r}
+#create a model with correlated values price and sqft_living
+model2<- lm(price ~ sqft_living + bedrooms, data=df_f)
+summary(model2)
 ```
